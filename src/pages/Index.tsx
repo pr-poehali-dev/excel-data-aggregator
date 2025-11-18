@@ -11,6 +11,7 @@ import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { useNavigate } from 'react-router-dom';
 
 const mockChartData = [
   { name: 'Янв', uploads: 12, merges: 8 },
@@ -36,6 +37,7 @@ const mockUsers = [
 ];
 
 export default function Index() {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [dragActive, setDragActive] = useState(false);
 
@@ -121,6 +123,10 @@ export default function Index() {
               
               <Separator className="my-4" />
               
+              <Button variant="ghost" className="w-full justify-start" onClick={() => navigate('/ks2-analytics')}>
+                <Icon name="FileSpreadsheet" size={20} className="mr-3" />
+                Аналитика КС-2
+              </Button>
               <Button variant="ghost" className="w-full justify-start">
                 <Icon name="Settings" size={20} className="mr-3" />
                 Настройки
