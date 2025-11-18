@@ -339,6 +339,9 @@ export default function Index() {
                         <div className="flex items-center gap-4">
                           {getStatusBadge(file.status)}
                           <Button variant="ghost" size="sm">
+                            <Icon name="Download" size={18} />
+                          </Button>
+                          <Button variant="ghost" size="sm">
                             <Icon name="MoreVertical" size={18} />
                           </Button>
                         </div>
