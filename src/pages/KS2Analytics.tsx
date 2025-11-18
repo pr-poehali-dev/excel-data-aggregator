@@ -9,6 +9,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Separator } from '@/components/ui/separator';
 import Icon from '@/components/ui/icon';
 import { useNavigate } from 'react-router-dom';
+import { generateKS2Excel, downloadKS2Excel } from '@/utils/ks2ExcelGenerator';
+import { toast } from 'sonner';
 
 const mockSourceFiles = [
   { id: 1, name: 'Объект_1_Апрель.xlsx', rows: 45, date: '15.04.2024', selected: false },
@@ -30,6 +32,10 @@ export default function KS2Analytics() {
   const [selectedFiles, setSelectedFiles] = useState<number[]>([]);
   const [reportName, setReportName] = useState('КС-2_Сводный_отчет');
   const [reportPeriod, setReportPeriod] = useState('Апрель 2024');
+  const [contractor, setContractor] = useState('ООО "СтройМонтаж"');
+  const [customer, setCustomer] = useState('ООО "Заказчик"');
+  const [contract, setContract] = useState('№ 123/2024 от 01.01.2024');
+  const [isGenerating, setIsGenerating] = useState(false);
 
   const toggleFileSelection = (fileId: number) => {
     setSelectedFiles(prev =>
@@ -46,6 +52,32 @@ export default function KS2Analytics() {
   };
 
   const totalAmount = mockKS2Data.reduce((sum, item) => sum + item.total, 0);
+
+  const handleDownloadKS2 = async () => {
+    try {
+      setIsGenerating(true);
+      toast.info('Генерация Excel файла...');
+
+      const reportData = {
+        reportName,
+        reportPeriod,
+        contractor,
+        customer,
+        contract,
+        items: mockKS2Data
+      };
+
+      const blob = await generateKS2Excel(reportData);
+      downloadKS2Excel(blob, reportName);
+
+      toast.success('Файл КС-2 успешно создан и загружен!');
+    } catch (error) {
+      console.error('Ошибка генерации файла:', error);
+      toast.error('Ошибка при создании файла КС-2');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -101,9 +133,9 @@ export default function KS2Analytics() {
                 <h2 className="text-3xl font-bold">Формирование КС-2</h2>
                 <p className="text-muted-foreground mt-1">Объединение данных в единую таблицу для аналитики</p>
               </div>
-              <Button className="gap-2" size="lg">
+              <Button className="gap-2" size="lg" onClick={handleDownloadKS2} disabled={isGenerating}>
                 <Icon name="Download" size={18} />
-                Скачать КС-2
+                {isGenerating ? 'Генерация...' : 'Скачать КС-2'}
               </Button>
             </div>
 
@@ -196,6 +228,33 @@ export default function KS2Analytics() {
                         id="reportPeriod"
                         value={reportPeriod}
                         onChange={(e) => setReportPeriod(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contractor" className="text-sm">Подрядчик</Label>
+                      <Input
+                        id="contractor"
+                        value={contractor}
+                        onChange={(e) => setContractor(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="customer" className="text-sm">Заказчик</Label>
+                      <Input
+                        id="customer"
+                        value={customer}
+                        onChange={(e) => setCustomer(e.target.value)}
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contract" className="text-sm">Договор</Label>
+                      <Input
+                        id="contract"
+                        value={contract}
+                        onChange={(e) => setContract(e.target.value)}
                         className="mt-1"
                       />
                     </div>
